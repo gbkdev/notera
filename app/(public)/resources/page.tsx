@@ -1,0 +1,39 @@
+import type { Metadata } from "next";
+import { SearchX } from "lucide-react";
+import { getFilterOptions, searchResources, type ResourceSearch } from "@/lib/queries";
+import { ResourceFilters } from "@/components/resource-filters";
+import { ResourceGrid } from "@/components/resource-card";
+import { Pagination } from "@/components/pagination";
+import { EmptyState } from "@/components/ui/misc";
+import { LinkButton } from "@/components/ui/button";
+
+export const metadata: Metadata = { title: "Browse resources" };
+export const dynamic = "force-dynamic";
+
+export default async function ResourcesPage({ searchParams }: { searchParams: ResourceSearch }) {
+  const [options, result] = await Promise.all([getFilterOptions(), searchResources(searchParams)]);
+  const filtered = Object.entries(searchParams).some(([k, v]) => v && k !== "page" && k !== "sort");
+
+  return (
+    <div className="py-14">
+      <h1 className="text-4xl font-bold sm:text-5xl">{searchParams.q ? `Results for “${searchParams.q.slice(0, 60)}”` : "All resources"}</h1>
+      <p className="mt-3 text-muted-foreground" aria-live="polite">
+        {result.total} {result.total === 1 ? "resource" : "resources"}{filtered ? " match your filters" : ""}
+      </p>
+      <div className="mt-8"><ResourceFilters years={options.years} semesterNames={options.semesterNames} departments={options.departments} /></div>
+      <div className="mt-8">
+        {result.resources.length === 0 ? (
+          <EmptyState icon={SearchX} title={filtered ? "Nothing matches those filters" : "No resources yet"}
+            action={filtered ? <LinkButton href="/resources" variant="outline">Clear filters</LinkButton> : undefined}>
+            {filtered ? "Try a shorter search, or remove a filter." : "Files appear here as soon as an administrator uploads them."}
+          </EmptyState>
+        ) : (
+          <>
+            <ResourceGrid resources={result.resources} />
+            <Pagination basePath="/resources" params={searchParams as Record<string, string | undefined>} page={result.page} pageCount={result.pageCount} />
+          </>
+        )}
+      </div>
+    </div>
+  );
+}

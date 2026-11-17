@@ -1,0 +1,54 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 220 25% 96%;
+    --foreground: 226 50% 14%;
+    --card: 0 0% 100%;
+    --card-foreground: 226 50% 14%;
+    --muted: 220 20% 92%;
+    --muted-foreground: 224 14% 38%;
+    --border: 220 18% 86%;
+    --input: 220 16% 76%;
+    --primary: 229 72% 48%;
+    --primary-foreground: 0 0% 100%;
+    --accent: 41 100% 62%;
+    --accent-foreground: 226 50% 14%;
+    --destructive: 0 70% 45%;
+    --ring: 229 72% 48%;
+    --fmt-pdf: 4 68% 48%;
+    --fmt-ppt: 22 82% 46%;
+    --fmt-doc: 219 72% 50%;
+    --fmt-xls: 152 56% 33%;
+  }
+  .dark {
+    --background: 228 40% 8%;
+    --foreground: 220 30% 94%;
+    --card: 228 32% 12%;
+    --card-foreground: 220 30% 94%;
+    --muted: 228 26% 17%;
+    --muted-foreground: 222 16% 70%;
+    --border: 228 22% 22%;
+    --input: 228 18% 32%;
+    --primary: 229 100% 80%;
+    --primary-foreground: 228 40% 10%;
+    --accent: 41 100% 62%;
+    --accent-foreground: 226 50% 12%;
+    --destructive: 0 80% 66%;
+    --ring: 229 100% 80%;
+    --fmt-pdf: 4 85% 64%;
+    --fmt-ppt: 24 90% 62%;
+    --fmt-doc: 219 90% 70%;
+    --fmt-xls: 152 55% 52%;
+  }
+  * { @apply border-border; }
+  body { @apply bg-background font-sans text-foreground antialiased; }
+  h1, h2, h3 { @apply font-display tracking-tight; }
+  :focus-visible { outline: 2px solid hsl(var(--ring)); outline-offset: 2px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}

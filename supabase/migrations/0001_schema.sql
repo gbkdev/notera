@@ -1,4 +1,4 @@
--- CampusHub schema ----------------------------------------------------------
+-- Notera schema ----------------------------------------------------------
 create extension if not exists pgcrypto;
 
 -- Admin profiles: a user listed here is an administrator ---------------------

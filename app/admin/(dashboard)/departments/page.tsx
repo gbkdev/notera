@@ -4,7 +4,7 @@ import { requireAdmin } from "@/lib/auth";
 import { getDepartments } from "@/lib/queries";
 import { DepartmentForm } from "@/components/admin/simple-forms";
 import { DeleteButton } from "@/components/admin/bits";
-import { buttonVariants } from "@/components/ui/button";
+import { buttonVariants, LinkButton } from "@/components/ui/button";
 import { deleteDepartment } from "@/app/actions/admin";
 
 export default async function AdminDepartments({ searchParams }: { searchParams: { edit?: string } }) {
@@ -13,7 +13,7 @@ export default async function AdminDepartments({ searchParams }: { searchParams:
   const editing = departments.find((d) => d.id === searchParams.edit);
   return (
     <div className="space-y-8">
-      <h1 className="text-3xl font-bold">Departments</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3"><h1 className="text-3xl font-bold">Departments</h1><LinkButton href="/admin/import" variant="outline">Add many from JSON</LinkButton></div>
       <section className="rounded-lg border bg-card p-5">
         <h2 className="mb-4 font-semibold">{editing ? `Edit ${editing.name}` : "Add a department"}</h2>
         <DepartmentForm key={editing?.id ?? "new"} id={editing?.id}

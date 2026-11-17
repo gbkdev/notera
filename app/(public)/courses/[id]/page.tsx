@@ -25,7 +25,7 @@ export default async function CoursePage({ params, searchParams }: { params: { i
   return (
     <div className="py-14">
       <nav aria-label="Breadcrumb" className="mb-6 text-sm text-muted-foreground">
-        <Link href="/departments" className="hover:text-foreground">Departments</Link> /{" "}
+        <Link href="/" className="hover:text-foreground">Home</Link> / <Link href="/departments" className="hover:text-foreground">Departments</Link> /{" "}
         <Link href={`/departments/${course.department_slug}`} className="hover:text-foreground">{course.department_name}</Link> /{" "}
         <span className="text-foreground">{course.code}</span>
       </nav>

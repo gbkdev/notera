@@ -1,4 +1,4 @@
-# CampusHub
+# Notera
 
 A public academic resource library. Students browse, preview and download files with no account;
 administrators manage everything from a protected dashboard.
@@ -17,7 +17,8 @@ Next.js 14 (App Router) · TypeScript · Tailwind · Supabase (Postgres, Storage
    select id, 'Your Name' from auth.users where email = 'you@university.edu';
    ```
 4. `cp .env.example .env.local` and fill in the project URL and **anon** key.
-5. `npm install && npm run dev`, then open `/admin/login`.
+5. `npm install && npm run dev`, then open `/admin` (there is no public link to it; type the address).
+6. Optional: Admin → Import JSON adds many departments, years, semesters and courses at once (a template is downloadable on that page).
 
 ## Environment variables
 | Name | Where | Purpose |

@@ -115,3 +115,11 @@ export async function getFilterOptions() {
     departments: (departments.data ?? []) as { id: string; name: string }[],
   };
 }
+
+export async function getPopularCourses(limit = 6) {
+  const { data, error } = await createClient()
+    .from("course_details").select("*").gt("resource_count", 0)
+    .order("resource_count", { ascending: false }).order("code").limit(limit);
+  if (error) throw new Error(error.message);
+  return (data ?? []) as Course[];
+}

@@ -1,10 +1,13 @@
 import Link from "next/link";
-import { Download, Eye, Info } from "lucide-react";
+import { Download, Eye, FileSpreadsheet, FileText, Info, Presentation } from "lucide-react";
 import { FORMAT_STYLE, formatGroupOf } from "@/lib/constants";
 import { downloadUrl } from "@/lib/storage";
 import type { Resource } from "@/lib/types";
 import { cn, formatBytes, formatDate } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
+import { previewKind } from "@/lib/preview";
+
+const GROUP_ICON = { pdf: FileText, ppt: Presentation, doc: FileText, xls: FileSpreadsheet } as const;
 
 export function FormatBadge({ ext, className }: { ext: string; className?: string }) {
   const s = FORMAT_STYLE[formatGroupOf(ext)];
@@ -16,7 +19,8 @@ export function FormatBadge({ ext, className }: { ext: string; className?: strin
 /** The coloured spine on the left edge works like a book spine: its colour tells you the file format at a glance. */
 export function ResourceCard({ r }: { r: Resource }) {
   const s = FORMAT_STYLE[formatGroupOf(r.file_ext)];
-  const canPreview = r.file_ext === "pdf";
+  const canPreview = previewKind(r) !== null;
+  const Icon = GROUP_ICON[formatGroupOf(r.file_ext) as keyof typeof GROUP_ICON];
   return (
     <article className="group relative flex overflow-hidden rounded-lg border bg-card transition-shadow hover:shadow-md">
       <div className={cn("w-2 shrink-0", s.spine)} aria-hidden />
@@ -27,6 +31,7 @@ export function ResourceCard({ r }: { r: Resource }) {
           </h3>
           <FormatBadge ext={r.file_ext} />
         </div>
+        <p className="flex items-center gap-1.5 truncate text-xs text-muted-foreground"><Icon className="h-3.5 w-3.5 shrink-0" aria-hidden /><span className="truncate">{r.file_name}</span></p>
         <p className="text-sm text-muted-foreground">
           <span className="font-medium text-foreground">{r.course_code}</span> {r.course_name}
         </p>

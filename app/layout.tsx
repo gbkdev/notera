@@ -9,7 +9,7 @@ const sans = Instrument_Sans({ subsets: ["latin"], variable: "--font-sans", disp
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
-  title: { default: "CampusHub — Your Learning Resources, All in One Place", template: "%s · CampusHub" },
+  title: { default: "Notera — Your Learning Resources, All in One Place", template: "%s · Notera" },
   description: "Find, preview and download lecture notes, assignments, exams and slides for your courses. No account needed.",
 };
 

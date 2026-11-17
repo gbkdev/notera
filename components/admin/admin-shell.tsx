@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { BookMarked, Building2, CalendarRange, FileStack, LayoutDashboard, LogOut } from "lucide-react";
+import { BookMarked, Building2, CalendarRange, FileJson, FileStack, LayoutDashboard, LogOut } from "lucide-react";
 import { signOutAdmin } from "@/app/actions/auth";
 import { Logo } from "@/components/site-header";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -14,6 +14,7 @@ const NAV = [
   { href: "/admin/courses", label: "Courses", icon: BookMarked },
   { href: "/admin/departments", label: "Departments", icon: Building2 },
   { href: "/admin/terms", label: "Years & semesters", icon: CalendarRange },
+  { href: "/admin/import", label: "Import JSON", icon: FileJson },
 ];
 
 export function AdminShell({ name, children }: { name: string; children: React.ReactNode }) {

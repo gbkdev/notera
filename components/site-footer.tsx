@@ -30,8 +30,8 @@ export function SiteFooter() {
       </div>
       <div className="border-t">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-5 text-xs text-muted-foreground sm:px-6">
-          <span>© {new Date().getFullYear()} CampusHub</span>
-          <Link href="/admin" className="hover:text-foreground">Admin sign in</Link>
+          <span>© {new Date().getFullYear()} Notera</span>
+          <span>Powered by gbkdev</span>
         </div>
       </div>
     </footer>

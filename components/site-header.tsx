@@ -18,7 +18,7 @@ export function Logo() {
       <span className="grid h-8 w-8 place-items-center rounded-md bg-primary text-primary-foreground" aria-hidden>
         <span className="flex gap-[3px]"><i className="block h-4 w-[3px] rounded-sm bg-fmt-pdf" /><i className="block h-4 w-[3px] rounded-sm bg-accent" /><i className="block h-4 w-[3px] rounded-sm bg-fmt-xls" /></span>
       </span>
-      CampusHub
+      Notera
     </Link>
   );
 }

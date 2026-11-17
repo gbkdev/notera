@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, FolderOpen } from "lucide-react";
 import { CATEGORIES } from "@/lib/constants";
-import { getDepartments, getFeaturedResources, getRecentResources } from "@/lib/queries";
+import { getDepartments, getFeaturedResources, getPopularCourses, getRecentResources } from "@/lib/queries";
 import { SearchBar } from "@/components/search-bar";
 import { ResourceCard, ResourceGrid } from "@/components/resource-card";
 import { DepartmentCard } from "@/components/department-card";
@@ -22,7 +22,7 @@ function SectionHead({ title, href, linkLabel }: { title: string; href: string; 
 }
 
 export default async function HomePage() {
-  const [departments, recent, featured] = await Promise.all([getDepartments(6), getRecentResources(6), getFeaturedResources(6)]);
+  const [departments, recent, featured, popular] = await Promise.all([getDepartments(6), getRecentResources(6), getFeaturedResources(6), getPopularCourses(6)]);
   const shelf = recent.slice(0, 3);
 
   return (
@@ -72,6 +72,21 @@ export default async function HomePage() {
         )}
       </section>
 
+      {popular.length > 0 && (
+        <section className="py-10">
+          <SectionHead title="Popular courses" href="/departments" linkLabel="Find your course" />
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {popular.map((c) => (
+              <Link key={c.id} href={`/courses/${c.id}`} className="flex flex-col gap-1 rounded-lg border bg-card p-4 hover:border-primary">
+                <span className="text-sm font-semibold text-primary">{c.code}</span>
+                <span className="font-semibold leading-snug">{c.name}</span>
+                <span className="mt-1 text-xs text-muted-foreground">{c.department_name} · {c.year_label}, {c.semester_name} · {c.resource_count} {c.resource_count === 1 ? "file" : "files"}</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
       <section className="py-10">
         <SectionHead title="Recently added" href="/resources" linkLabel="See everything" />
         {recent.length === 0
@@ -85,6 +100,23 @@ export default async function HomePage() {
           <ResourceGrid resources={featured} />
         </section>
       )}
+
+      <section className="py-10" aria-labelledby="how">
+        <h2 id="how" className="mb-6 text-2xl font-bold sm:text-3xl">How Notera works</h2>
+        <ol className="grid gap-4 md:grid-cols-3">
+          {[
+            ["Find your course", "Search by course code, file name or keyword, or open your department and pick your year and semester."],
+            ["Preview the file", "PDFs and Office documents open right in the page, so you can check it’s the right one before saving it."],
+            ["Download it", "One click, no account and no sign-up. Files download under their original name."],
+          ].map(([t, d], i) => (
+            <li key={t} className="rounded-lg border bg-card p-5">
+              <span className="mb-3 grid h-8 w-8 place-items-center rounded-full bg-primary text-sm font-bold text-primary-foreground">{i + 1}</span>
+              <h3 className="font-semibold">{t}</h3>
+              <p className="mt-1 text-sm text-muted-foreground">{d}</p>
+            </li>
+          ))}
+        </ol>
+      </section>
     </>
   );
 }

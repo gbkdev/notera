@@ -1,0 +1,14 @@
+{
+  "departments": [
+    { "name": "Computer Science", "slug": "computer-science", "description": "Programming, systems and software engineering.", "icon": "cpu" },
+    { "name": "Mathematics", "description": "Pure and applied mathematics.", "icon": "calculator" }
+  ],
+  "academic_years": [
+    { "label": "Year 1", "sort_order": 1, "semesters": [{ "name": "Semester 1" }, { "name": "Semester 2" }] },
+    { "label": "Year 2", "sort_order": 2, "semesters": [{ "name": "Semester 1" }, { "name": "Semester 2" }] }
+  ],
+  "courses": [
+    { "department": "computer-science", "year": "Year 1", "semester": "Semester 1", "code": "CS101", "name": "Introduction to Programming" },
+    { "department": "Mathematics", "year": "Year 1", "semester": "Semester 1", "code": "MATH101", "name": "Calculus I" }
+  ]
+}

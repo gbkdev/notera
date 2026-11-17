@@ -3,7 +3,7 @@ import { Pencil } from "lucide-react";
 import { requireAdmin } from "@/lib/auth";
 import { CourseForm } from "@/components/admin/simple-forms";
 import { DeleteButton } from "@/components/admin/bits";
-import { buttonVariants } from "@/components/ui/button";
+import { buttonVariants, LinkButton } from "@/components/ui/button";
 import { deleteCourse } from "@/app/actions/admin";
 import type { Course } from "@/lib/types";
 
@@ -23,7 +23,7 @@ export default async function AdminCourses({ searchParams }: { searchParams: { e
 
   return (
     <div className="space-y-8">
-      <h1 className="text-3xl font-bold">Courses</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3"><h1 className="text-3xl font-bold">Courses</h1><LinkButton href="/admin/import" variant="outline">Add many from JSON</LinkButton></div>
       <section className="rounded-lg border bg-card p-5">
         <h2 className="mb-4 font-semibold">{editing ? `Edit ${editing.code}` : "Add a course"}</h2>
         {missing && <p className="mb-4 rounded-md bg-muted p-3 text-sm">Add at least one <Link className="underline" href="/admin/departments">department</Link> and one <Link className="underline" href="/admin/terms">semester</Link> first.</p>}

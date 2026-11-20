@@ -2,21 +2,28 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SearchX } from "lucide-react";
-import { getCourse, searchResources, type ResourceSearch } from "@/lib/queries";
+import { getCourse, searchResources, type ResourceSearch } from "@/lib/public-queries";
 import { ResourceFilters } from "@/components/resource-filters";
 import { ResourceGrid } from "@/components/resource-card";
 import { Pagination } from "@/components/pagination";
 import { EmptyState } from "@/components/ui/misc";
 import { LinkButton } from "@/components/ui/button";
+import { ShareButton } from "@/components/share-button";
+import { ContributeCta } from "@/components/contribute-cta";
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+export async function generateMetadata(props: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const params = await props.params;
   const c = await getCourse(params.id);
-  return { title: c ? `${c.code} ${c.name}` : "Course" };
+  if (!c) return { title: "Course" };
+  const title = `${c.code} ${c.name}`;
+  const description = `${c.resource_count} ${c.resource_count === 1 ? "file" : "files"} for ${title} · ${c.department_name}, ${c.year_label}, ${c.semester_name}`;
+  return { title, description, openGraph: { title, description, siteName: "Notera" } };
 }
 
-export default async function CoursePage({ params, searchParams }: { params: { id: string }; searchParams: ResourceSearch }) {
+export default async function CoursePage(props: { params: Promise<{ id: string }>; searchParams: Promise<ResourceSearch> }) {
+  const [params, searchParams] = await Promise.all([props.params, props.searchParams]);
   const course = await getCourse(params.id);
   if (!course) notFound();
   const result = await searchResources({ ...searchParams, course: course.id });
@@ -34,16 +41,22 @@ export default async function CoursePage({ params, searchParams }: { params: { i
         {course.year_label} · {course.semester_name} · {course.resource_count} {course.resource_count === 1 ? "file" : "files"}
       </p>
       {course.description && <p className="mt-3 max-w-2xl text-muted-foreground">{course.description}</p>}
+      <div className="mt-5"><ShareButton path={`/courses/${course.id}`} title={`${course.code} ${course.name}`} /></div>
       <div className="mt-8"><ResourceFilters /></div>
       <div className="mt-8">
         {result.resources.length === 0 ? (
           <EmptyState icon={SearchX} title={filtered ? "Nothing matches those filters" : "No files for this course yet"}
-            action={filtered ? <LinkButton href={`/courses/${course.id}`} variant="outline">Clear filters</LinkButton> : undefined}>
+            action={<div className="flex flex-wrap justify-center gap-2">
+              {filtered && <LinkButton href={`/courses/${course.id}`} variant="outline">Clear filters</LinkButton>}
+              <LinkButton href={`/contribute?tab=request&course=${course.id}`}>Request files</LinkButton>
+              <LinkButton href={`/contribute?tab=share&course=${course.id}`} variant="outline">Share a file</LinkButton>
+            </div>}>
             {filtered ? "Try a different search or remove a filter." : "Check back soon, or browse other courses in this department."}
           </EmptyState>
         ) : (
           <>
             <ResourceGrid resources={result.resources} />
+            <div className="mt-8"><ContributeCta courseId={course.id} compact /></div>
             <Pagination basePath={`/courses/${course.id}`} params={searchParams as Record<string, string | undefined>} page={result.page} pageCount={result.pageCount} />
           </>
         )}

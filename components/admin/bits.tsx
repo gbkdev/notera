@@ -1,10 +1,10 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { Star, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { setFeatured } from "@/app/actions/admin";
+import { setFeatured, setReportStatus } from "@/app/actions/admin";
 import type { ActionResult } from "@/lib/types";
 
 /** Two-step delete: the first click asks, the second click deletes. */
@@ -28,15 +28,34 @@ export function DeleteButton({ action, label }: { action: () => Promise<ActionRe
 
 export function FeatureToggle({ id, featured }: { id: string; featured: boolean }) {
   const router = useRouter();
+  const [on, setOn] = useState(featured);
   const [pending, start] = useTransition();
+  useEffect(() => setOn(featured), [featured]);
   return (
-    <Button variant="ghost" size="sm" disabled={pending} aria-pressed={featured}
-      aria-label={featured ? "Remove from featured" : "Mark as featured"}
-      onClick={() => start(async () => {
-        const res = await setFeatured(id, !featured);
-        if (res.ok) { toast.success(featured ? "Removed from featured" : "Marked as featured"); router.refresh(); } else toast.error(res.error);
-      })}>
-      <Star className={featured ? "h-4 w-4 fill-accent text-accent" : "h-4 w-4"} />
+    <Button variant="ghost" size="sm" disabled={pending} aria-pressed={on}
+      aria-label={on ? "Remove from the homepage" : "Feature on the homepage"} title={on ? "Featured on the homepage. Click to remove" : "Click to feature on the homepage"}
+      onClick={() => {
+        const next = !on;
+        setOn(next); // flips instantly; rolls back if the server says no
+        start(async () => {
+          const res = await setFeatured(id, next);
+          if (res.ok) { toast.success(next ? "Added to the homepage" : "Removed from the homepage"); router.refresh(); }
+          else { setOn(!next); toast.error(res.error); }
+        });
+      }}>
+      <Star className={on ? "h-4 w-4 fill-accent text-accent" : "h-4 w-4"} />
     </Button>
+  );
+}
+
+export function ReportStatusButton({ id, status }: { id: string; status: "open" | "resolved" }) {
+  const router = useRouter();
+  const [pending, start] = useTransition();
+  const next = status === "open" ? "resolved" : "open";
+  return (
+    <Button variant="outline" size="sm" disabled={pending} onClick={() => start(async () => {
+      const res = await setReportStatus(id, next);
+      if (res.ok) { toast.success(next === "resolved" ? "Marked as resolved" : "Reopened"); router.refresh(); } else toast.error(res.error);
+    })}>{status === "open" ? "Mark resolved" : "Reopen"}</Button>
   );
 }

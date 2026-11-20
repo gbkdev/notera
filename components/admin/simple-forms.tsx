@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useEffect, useTransition } from "react";
+import { useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -102,7 +102,6 @@ export function CourseForm({ departments, semesters, initial, id }: {
   const empty = { department_id: "", semester_id: "", code: "", name: "", description: "" };
   const form = useForm<CourseValues>({ resolver: zodResolver(courseSchema), defaultValues: initial ?? empty });
   const { register, handleSubmit, formState: { errors } } = form;
-  useEffect(() => { if (initial) form.reset(initial); }, [initial, form]);
   return (
     <form noValidate className="grid gap-4 sm:grid-cols-2" onSubmit={handleSubmit((v) => submit(() => saveCourse(v, id), () => form.reset(empty)))}>
       <Field label="Department" error={errors.department_id?.message}>

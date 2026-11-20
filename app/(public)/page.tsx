@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { ArrowRight, FolderOpen } from "lucide-react";
 import { CATEGORIES } from "@/lib/constants";
-import { getDepartments, getFeaturedResources, getPopularCourses, getRecentResources } from "@/lib/queries";
+import { getDepartments, getFeaturedResources, getMostDownloaded, getPopularCourses, getRecentResources } from "@/lib/public-queries";
 import { SearchBar } from "@/components/search-bar";
 import { ResourceCard, ResourceGrid } from "@/components/resource-card";
 import { DepartmentCard } from "@/components/department-card";
 import { EmptyState } from "@/components/ui/misc";
 import { LinkButton } from "@/components/ui/button";
+import { ContributeCta } from "@/components/contribute-cta";
 
 export const dynamic = "force-dynamic";
 
@@ -22,7 +23,7 @@ function SectionHead({ title, href, linkLabel }: { title: string; href: string; 
 }
 
 export default async function HomePage() {
-  const [departments, recent, featured, popular] = await Promise.all([getDepartments(6), getRecentResources(6), getFeaturedResources(6), getPopularCourses(6)]);
+  const [departments, recent, featured, popular, topDownloads] = await Promise.all([getDepartments(6), getRecentResources(6), getFeaturedResources(6), getPopularCourses(6), getMostDownloaded(6)]);
   const shelf = recent.slice(0, 3);
 
   return (
@@ -61,6 +62,13 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {featured.length > 0 && (
+        <section className="py-10">
+          <SectionHead title="Featured resources" href="/resources" linkLabel="Browse all" />
+          <ResourceGrid resources={featured} />
+        </section>
+      )}
+
       <section className="py-10">
         <SectionHead title="Browse by department" href="/departments" linkLabel="All departments" />
         {departments.length === 0 ? (
@@ -94,12 +102,15 @@ export default async function HomePage() {
           : <ResourceGrid resources={recent} />}
       </section>
 
-      {featured.length > 0 && (
+      {topDownloads.length > 0 && (
         <section className="py-10">
-          <SectionHead title="Featured resources" href="/resources" linkLabel="Browse all" />
-          <ResourceGrid resources={featured} />
+          <SectionHead title="Most downloaded" href="/resources?sort=popular" linkLabel="See the top list" />
+          <ResourceGrid resources={topDownloads} />
         </section>
       )}
+
+
+      <section className="py-10"><ContributeCta /></section>
 
       <section className="py-10" aria-labelledby="how">
         <h2 id="how" className="mb-6 text-2xl font-bold sm:text-3xl">How Notera works</h2>

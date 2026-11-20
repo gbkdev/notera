@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 
 /** Returns the signed-in administrator, or null. Checks the admin_profiles table, not just the session. */
 export async function getAdmin() {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
   const { data: profile } = await supabase

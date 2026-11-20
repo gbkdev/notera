@@ -2,20 +2,23 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { FolderOpen } from "lucide-react";
-import { getCoursesForDepartment, getDepartmentBySlug } from "@/lib/queries";
+import { getCoursesForDepartment, getDepartmentBySlug } from "@/lib/public-queries";
 import { DeptIcon } from "@/components/dept-icon";
 import { EmptyState } from "@/components/ui/misc";
 import { LinkButton } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { ContributeCta } from "@/components/contribute-cta";
 
 export const dynamic = "force-dynamic";
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+export async function generateMetadata(props: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const params = await props.params;
   const d = await getDepartmentBySlug(params.slug);
   return { title: d?.name ?? "Department" };
 }
 
-export default async function DepartmentPage({ params, searchParams }: { params: { slug: string }; searchParams: { year?: string; semester?: string } }) {
+export default async function DepartmentPage(props: { params: Promise<{ slug: string }>; searchParams: Promise<{ year?: string; semester?: string }> }) {
+  const [params, searchParams] = await Promise.all([props.params, props.searchParams]);
   const dept = await getDepartmentBySlug(params.slug);
   if (!dept) notFound();
   const courses = await getCoursesForDepartment(dept.id);
@@ -47,7 +50,7 @@ export default async function DepartmentPage({ params, searchParams }: { params:
       <div className="mt-6"><LinkButton href={`/resources?dept=${dept.id}`} variant="outline">Search this department</LinkButton></div>
 
       {courses.length === 0 ? (
-        <div className="mt-10"><EmptyState icon={FolderOpen} title="No courses yet">Courses for this department haven’t been added.</EmptyState></div>
+        <div className="mt-10"><EmptyState icon={FolderOpen} title="No courses yet" action={<LinkButton href={`/contribute?tab=request&dept=${dept.id}`}>Request your courses</LinkButton>}>Courses for this department haven’t been added.</EmptyState></div>
       ) : (
         <div className="mt-10 space-y-6">
           <div role="group" aria-label="Academic year" className="flex flex-wrap gap-2">
@@ -71,6 +74,7 @@ export default async function DepartmentPage({ params, searchParams }: { params:
               </li>
             ))}
           </ul>
+          <div className="pt-4"><ContributeCta deptId={dept.id} compact /></div>
         </div>
       )}
     </div>

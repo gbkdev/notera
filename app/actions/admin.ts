@@ -1,8 +1,9 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { refreshCatalog } from "@/lib/revalidate";
 import { getAdmin } from "@/lib/auth";
-import { ALLOWED_EXTS, EXT_MIME, MAX_FILE_SIZE, type FileExt } from "@/lib/constants";
+import { MAX_FILE_SIZE } from "@/lib/constants";
+import { ALLOWED_EXTS, EXT_MIME, type FileExt } from "@/lib/formats";
 import { RESOURCE_BUCKET } from "@/lib/storage";
 import type { ActionResult } from "@/lib/types";
 import {
@@ -20,9 +21,7 @@ function friendly(error: NonNullable<PgError>, noun: string): string {
   return error.message;
 }
 
-function refresh() {
-  revalidatePath("/", "layout");
-}
+const refresh = refreshCatalog;
 
 /** Every action starts here: the caller must be a signed-in administrator. */
 async function admin() {
@@ -251,6 +250,29 @@ export async function setFeatured(id: string, featured: boolean) {
     const { supabase } = await admin();
     const { error } = await supabase.from("resources").update({ featured }).eq("id", id);
     if (error) return { ok: false, error: friendly(error, "resource") };
+    refresh();
+    return { ok: true };
+  });
+}
+
+/* ----------------------------------- reports ------------------------------------ */
+export async function setReportStatus(id: string, status: "open" | "resolved") {
+  return run(async () => {
+    const { supabase } = await admin();
+    if (!UUID_RE.test(id) || (status !== "open" && status !== "resolved")) return invalid();
+    const { error } = await supabase.from("reports").update({ status }).eq("id", id);
+    if (error) return { ok: false, error: friendly(error, "report") };
+    refresh();
+    return { ok: true };
+  });
+}
+
+export async function deleteReport(id: string) {
+  return run(async () => {
+    const { supabase } = await admin();
+    if (!UUID_RE.test(id)) return invalid();
+    const { error } = await supabase.from("reports").delete().eq("id", id);
+    if (error) return { ok: false, error: friendly(error, "report") };
     refresh();
     return { ok: true };
   });

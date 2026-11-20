@@ -7,7 +7,8 @@ import { DeleteButton } from "@/components/admin/bits";
 import { buttonVariants, LinkButton } from "@/components/ui/button";
 import { deleteDepartment } from "@/app/actions/admin";
 
-export default async function AdminDepartments({ searchParams }: { searchParams: { edit?: string } }) {
+export default async function AdminDepartments(props: { searchParams: Promise<{ edit?: string }> }) {
+  const searchParams = await props.searchParams;
   await requireAdmin();
   const departments = await getDepartments();
   const editing = departments.find((d) => d.id === searchParams.edit);

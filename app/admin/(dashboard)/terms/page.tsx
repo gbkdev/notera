@@ -7,7 +7,8 @@ import { buttonVariants } from "@/components/ui/button";
 import { deleteSemester, deleteYear } from "@/app/actions/admin";
 import type { AcademicYear, Semester } from "@/lib/types";
 
-export default async function AdminTerms({ searchParams }: { searchParams: { year?: string; semester?: string } }) {
+export default async function AdminTerms(props: { searchParams: Promise<{ year?: string; semester?: string }> }) {
+  const searchParams = await props.searchParams;
   const { supabase } = await requireAdmin();
   const [y, s] = await Promise.all([
     supabase.from("academic_years").select("*").order("sort_order").order("label"),

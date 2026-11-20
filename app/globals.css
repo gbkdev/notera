@@ -22,6 +22,9 @@
     --fmt-ppt: 22 82% 46%;
     --fmt-doc: 219 72% 50%;
     --fmt-xls: 152 56% 33%;
+    --fmt-txt: 215 16% 40%;
+    --fmt-img: 280 52% 46%;
+    --fmt-zip: 36 78% 34%;
   }
   .dark {
     --background: 228 40% 8%;
@@ -42,6 +45,9 @@
     --fmt-ppt: 24 90% 62%;
     --fmt-doc: 219 90% 70%;
     --fmt-xls: 152 55% 52%;
+    --fmt-txt: 215 18% 70%;
+    --fmt-img: 280 80% 74%;
+    --fmt-zip: 38 85% 62%;
   }
   * { @apply border-border; }
   body { @apply bg-background font-sans text-foreground antialiased; }

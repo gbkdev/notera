@@ -5,11 +5,14 @@ import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { useSaved } from "@/lib/use-saved";
 import { cn } from "@/lib/utils";
 
 const NAV = [
   { href: "/departments", label: "Departments" },
   { href: "/resources", label: "All resources" },
+  { href: "/saved", label: "Saved" },
+  { href: "/contribute", label: "Contribute" },
 ];
 
 export function Logo() {
@@ -26,6 +29,8 @@ export function Logo() {
 export function SiteHeader() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const { ids, ready } = useSaved();
+  const count = (href: string) => (href === "/saved" && ready && ids.length > 0 ? ids.length : 0);
   useEffect(() => setOpen(false), [pathname]);
 
   return (
@@ -36,7 +41,7 @@ export function SiteHeader() {
           {NAV.map((n) => (
             <Link key={n.href} href={n.href}
               className={cn("rounded-md px-3 py-2 text-sm font-medium hover:bg-muted", pathname.startsWith(n.href) && "bg-muted")}>
-              {n.label}
+              {n.label}{count(n.href) > 0 && <span className="ml-1.5 rounded-full bg-primary px-1.5 py-0.5 text-xs text-primary-foreground">{count(n.href)}</span>}
             </Link>
           ))}
           <ThemeToggle />
@@ -53,7 +58,7 @@ export function SiteHeader() {
         <nav id="mobile-nav" aria-label="Mobile" className="border-t bg-background px-4 py-3 md:hidden">
           {[{ href: "/", label: "Home" }, ...NAV].map((n) => (
             <Link key={n.href} href={n.href} className="block rounded-md px-3 py-3 text-base font-medium hover:bg-muted">
-              {n.label}
+              {n.label}{count(n.href) > 0 && <span className="ml-2 rounded-full bg-primary px-2 py-0.5 text-xs text-primary-foreground">{count(n.href)}</span>}
             </Link>
           ))}
         </nav>

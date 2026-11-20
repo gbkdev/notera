@@ -11,14 +11,15 @@ import { Button } from "@/components/ui/button";
 import { deleteResource } from "@/app/actions/admin";
 import { formatBytes, formatDate } from "@/lib/utils";
 
-export default async function AdminResources({ searchParams }: { searchParams: ResourceSearch }) {
+export default async function AdminResources(props: { searchParams: Promise<ResourceSearch> }) {
+  const searchParams = await props.searchParams;
   await requireAdmin();
   const result = await searchResources({ q: searchParams.q, page: searchParams.page, sort: searchParams.sort });
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-3xl font-bold">Resources</h1>
-        <LinkButton href="/admin/resources/new">Upload resource</LinkButton>
+        <div className="flex gap-2"><LinkButton href="/admin/resources/bulk" variant="outline">Bulk upload</LinkButton><LinkButton href="/admin/resources/new">Upload resource</LinkButton></div>
       </div>
       <form role="search" className="flex max-w-lg gap-2">
         <Input name="q" defaultValue={searchParams.q ?? ""} aria-label="Search resources" placeholder="Search by title, course or department" />
@@ -32,7 +33,7 @@ export default async function AdminResources({ searchParams }: { searchParams: R
           <li key={r.id} className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
             <div className="min-w-0">
               <p className="flex items-center gap-2 font-medium"><FormatBadge ext={r.file_ext} /><span className="truncate">{r.title}</span></p>
-              <p className="text-sm text-muted-foreground">{r.course_code} · {r.category_label} · {formatBytes(r.file_size)} · {formatDate(r.created_at)}</p>
+              <p className="text-sm text-muted-foreground">{r.course_code} · {r.category_label} · {formatBytes(r.file_size)} · {formatDate(r.created_at)} · {r.download_count} {r.download_count === 1 ? "download" : "downloads"}</p>
             </div>
             <div className="flex items-center gap-1">
               <FeatureToggle id={r.id} featured={r.featured} />

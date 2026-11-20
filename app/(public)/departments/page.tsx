@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { FolderOpen } from "lucide-react";
-import { getDepartments } from "@/lib/queries";
+import { getDepartments } from "@/lib/public-queries";
 import { DepartmentCard } from "@/components/department-card";
 import { EmptyState } from "@/components/ui/misc";
 

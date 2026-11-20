@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CATEGORIES } from "@/lib/constants";
 import { Logo } from "@/components/site-header";
+import { InstallButton } from "@/components/install-button";
 
 export function SiteFooter() {
   return (
@@ -11,12 +12,14 @@ export function SiteFooter() {
           <p className="max-w-xs text-sm text-muted-foreground">
             Free course materials for university students. Browse, preview and download without an account.
           </p>
+          <InstallButton />
         </div>
         <div>
           <h2 className="mb-3 text-sm font-semibold">Browse</h2>
           <ul className="space-y-2 text-sm text-muted-foreground">
             <li><Link className="hover:text-foreground" href="/departments">Departments</Link></li>
             <li><Link className="hover:text-foreground" href="/resources">All resources</Link></li>
+            <li><Link className="hover:text-foreground" href="/contribute">Request or share a file</Link></li>
           </ul>
         </div>
         <div>

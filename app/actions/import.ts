@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { refreshCatalog } from "@/lib/revalidate";
 import { getAdmin } from "@/lib/auth";
 import { buildPlan, catalogSchema, formatZodErrors, MAX_IMPORT_CHARS, type Existing, type ImportResult } from "@/lib/catalog-import";
 
@@ -78,6 +78,6 @@ export async function importCatalog(text: string, dryRun: boolean): Promise<Impo
     }
   }
 
-  revalidatePath("/", "layout");
+  refreshCatalog();
   return { ok: true, dryRun: false, summary: plan.summary };
 }

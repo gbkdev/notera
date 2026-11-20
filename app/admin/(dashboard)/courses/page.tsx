@@ -7,7 +7,8 @@ import { buttonVariants, LinkButton } from "@/components/ui/button";
 import { deleteCourse } from "@/app/actions/admin";
 import type { Course } from "@/lib/types";
 
-export default async function AdminCourses({ searchParams }: { searchParams: { edit?: string } }) {
+export default async function AdminCourses(props: { searchParams: Promise<{ edit?: string }> }) {
+  const searchParams = await props.searchParams;
   const { supabase } = await requireAdmin();
   const [c, d, s] = await Promise.all([
     supabase.from("course_details").select("*").order("department_name").order("year_sort").order("semester_sort").order("code"),

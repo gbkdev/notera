@@ -17,36 +17,8 @@ export const CATEGORIES = [
 export type CategoryValue = (typeof CATEGORIES)[number]["value"];
 export const CATEGORY_VALUES = CATEGORIES.map((c) => c.value) as [CategoryValue, ...CategoryValue[]];
 
-export const FORMAT_GROUPS = [
-  { value: "pdf", label: "PDF", exts: ["pdf"] },
-  { value: "ppt", label: "PowerPoint", exts: ["ppt", "pptx"] },
-  { value: "doc", label: "Word", exts: ["doc", "docx"] },
-  { value: "xls", label: "Excel", exts: ["xls", "xlsx"] },
-] as const;
-
-export const ALLOWED_EXTS = ["pdf", "ppt", "pptx", "doc", "docx", "xls", "xlsx"] as const;
-export type FileExt = (typeof ALLOWED_EXTS)[number];
-
-export const EXT_MIME: Record<FileExt, string> = {
-  pdf: "application/pdf",
-  ppt: "application/vnd.ms-powerpoint",
-  pptx: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-  doc: "application/msword",
-  docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-  xls: "application/vnd.ms-excel",
-  xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-};
-
-// Full class names are written out so Tailwind can see them.
-export const FORMAT_STYLE: Record<string, { label: string; spine: string; chip: string }> = {
-  pdf: { label: "PDF", spine: "bg-fmt-pdf", chip: "bg-fmt-pdf/15 text-fmt-pdf" },
-  ppt: { label: "PPT", spine: "bg-fmt-ppt", chip: "bg-fmt-ppt/15 text-fmt-ppt" },
-  doc: { label: "DOC", spine: "bg-fmt-doc", chip: "bg-fmt-doc/15 text-fmt-doc" },
-  xls: { label: "XLS", spine: "bg-fmt-xls", chip: "bg-fmt-xls/15 text-fmt-xls" },
-};
-export function formatGroupOf(ext: string) {
-  return ext.startsWith("ppt") ? "ppt" : ext.startsWith("doc") ? "doc" : ext.startsWith("xls") ? "xls" : "pdf";
-}
+// File-type definitions live in lib/formats.ts (re-exported so existing imports keep working).
+export { ALLOWED_EXTS, EXT_MIME, FORMAT_GROUPS, FORMAT_STYLE, formatGroupOf, type FileExt } from "@/lib/formats";
 
 export const DEPARTMENT_ICONS: Record<string, { label: string; Icon: LucideIcon }> = {
   "graduation-cap": { label: "Graduation cap", Icon: GraduationCap },
@@ -68,4 +40,15 @@ export const SORTS = [
   { value: "newest", label: "Newest first" },
   { value: "oldest", label: "Oldest first" },
   { value: "az", label: "A to Z" },
+  { value: "popular", label: "Most downloaded" },
 ] as const;
+
+export const REPORT_REASONS = [
+  { value: "broken_file", label: "The file won’t open or download" },
+  { value: "wrong_content", label: "It isn’t what the title says" },
+  { value: "wrong_course", label: "It’s in the wrong course" },
+  { value: "copyright", label: "It shouldn’t be shared publicly (copyright)" },
+  { value: "other", label: "Something else" },
+] as const;
+export const REPORT_REASON_VALUES = REPORT_REASONS.map((r) => r.value) as [string, ...string[]];
+export const LARGE_FILE = 10 * 1024 * 1024; // sizes at or above this are flagged on cards

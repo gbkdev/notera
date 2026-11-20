@@ -5,7 +5,8 @@ import { getCourseOptions } from "@/components/admin/course-options";
 import { ResourceForm } from "@/components/admin/resource-form";
 import { LinkButton } from "@/components/ui/button";
 
-export default async function EditResource({ params }: { params: { id: string } }) {
+export default async function EditResource(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const { supabase } = await requireAdmin();
   const [r, courses] = await Promise.all([getResource(params.id), getCourseOptions(supabase)]);
   if (!r) notFound();

@@ -21,6 +21,9 @@ const config: Config = {
           ppt: "hsl(var(--fmt-ppt))",
           doc: "hsl(var(--fmt-doc))",
           xls: "hsl(var(--fmt-xls))",
+          txt: "hsl(var(--fmt-txt))",
+          img: "hsl(var(--fmt-img))",
+          zip: "hsl(var(--fmt-zip))",
         },
       },
       fontFamily: {

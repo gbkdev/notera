@@ -1,3 +1,4 @@
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { CATEGORY_VALUES, FORMAT_GROUPS, PAGE_SIZE } from "@/lib/constants";
 import { UUID_RE } from "@/lib/utils";
@@ -13,17 +14,15 @@ function cleanTerm(term: string) {
   return term.replace(/[%*,()\\"'`:;]/g, " ").replace(/\s+/g, " ").trim().slice(0, 80);
 }
 
-export async function searchResources(params: ResourceSearch, featuredOnly = false) {
-  const supabase = createClient();
-  let query = supabase.from("resource_details").select("*", { count: "exact" });
+/* ------------------------- implementations (client passed in) ------------------------- */
+export async function searchResourcesWith(sb: SupabaseClient, params: ResourceSearch, featuredOnly = false) {
+  let query = sb.from("resource_details").select("*", { count: "exact" });
 
   // Every word must match at least one searchable column.
   for (const word of cleanTerm(params.q ?? "").split(" ").filter(Boolean)) {
     query = query.or(
-      [
-        "title", "description", "course_name", "course_code",
-        "department_name", "category_label", "file_name",
-      ].map((col) => `${col}.ilike.%${word}%`).join(",")
+      ["title", "description", "course_name", "course_code", "department_name", "category_label", "file_name"]
+        .map((col) => `${col}.ilike.%${word}%`).join(",")
     );
   }
   if (params.category && (CATEGORY_VALUES as readonly string[]).includes(params.category))
@@ -38,6 +37,7 @@ export async function searchResources(params: ResourceSearch, featuredOnly = fal
 
   if (params.sort === "oldest") query = query.order("created_at", { ascending: true });
   else if (params.sort === "az") query = query.order("title", { ascending: true });
+  else if (params.sort === "popular") query = query.order("download_count", { ascending: false }).order("created_at", { ascending: false });
   else query = query.order("created_at", { ascending: false });
   query = query.order("id");
 
@@ -53,60 +53,70 @@ export async function searchResources(params: ResourceSearch, featuredOnly = fal
   };
 }
 
-export async function getRecentResources(limit = 6) {
-  const { data, error } = await createClient()
-    .from("resource_details").select("*").order("created_at", { ascending: false }).limit(limit);
+export async function getRecentResourcesWith(sb: SupabaseClient, limit = 6) {
+  const { data, error } = await sb.from("resource_details").select("*").order("created_at", { ascending: false }).limit(limit);
   if (error) throw new Error(error.message);
   return (data ?? []) as Resource[];
 }
 
-export async function getFeaturedResources(limit = 6) {
-  const { data, error } = await createClient()
-    .from("resource_details").select("*").eq("featured", true)
+export async function getFeaturedResourcesWith(sb: SupabaseClient, limit = 6) {
+  const { data, error } = await sb.from("resource_details").select("*").eq("featured", true)
     .order("created_at", { ascending: false }).limit(limit);
   if (error) throw new Error(error.message);
   return (data ?? []) as Resource[];
 }
 
-export async function getResource(id: string) {
+export async function getMostDownloadedWith(sb: SupabaseClient, limit = 6) {
+  const { data, error } = await sb.from("resource_details").select("*").gt("download_count", 0)
+    .order("download_count", { ascending: false }).order("created_at", { ascending: false }).limit(limit);
+  if (error) throw new Error(error.message);
+  return (data ?? []) as Resource[];
+}
+
+export async function getResourceWith(sb: SupabaseClient, id: string) {
   if (!UUID_RE.test(id)) return null;
-  const { data } = await createClient().from("resource_details").select("*").eq("id", id).maybeSingle();
+  const { data } = await sb.from("resource_details").select("*").eq("id", id).maybeSingle();
   return (data as Resource | null) ?? null;
 }
 
-export async function getDepartments(limit?: number) {
-  let q = createClient().from("department_stats").select("*").order("name");
+export async function getDepartmentsWith(sb: SupabaseClient, limit?: number) {
+  let q = sb.from("department_stats").select("*").order("name");
   if (limit) q = q.limit(limit);
   const { data, error } = await q;
   if (error) throw new Error(error.message);
   return (data ?? []) as Department[];
 }
 
-export async function getDepartmentBySlug(slug: string) {
-  const { data } = await createClient().from("department_stats").select("*").eq("slug", slug).maybeSingle();
+export async function getDepartmentBySlugWith(sb: SupabaseClient, slug: string) {
+  const { data } = await sb.from("department_stats").select("*").eq("slug", slug).maybeSingle();
   return (data as Department | null) ?? null;
 }
 
-export async function getCoursesForDepartment(departmentId: string) {
-  const { data, error } = await createClient()
-    .from("course_details").select("*").eq("department_id", departmentId)
+export async function getCoursesForDepartmentWith(sb: SupabaseClient, departmentId: string) {
+  const { data, error } = await sb.from("course_details").select("*").eq("department_id", departmentId)
     .order("year_sort").order("semester_sort").order("code");
   if (error) throw new Error(error.message);
   return (data ?? []) as Course[];
 }
 
-export async function getCourse(id: string) {
+export async function getCourseWith(sb: SupabaseClient, id: string) {
   if (!UUID_RE.test(id)) return null;
-  const { data } = await createClient().from("course_details").select("*").eq("id", id).maybeSingle();
+  const { data } = await sb.from("course_details").select("*").eq("id", id).maybeSingle();
   return (data as Course | null) ?? null;
 }
 
-export async function getFilterOptions() {
-  const supabase = createClient();
+export async function getPopularCoursesWith(sb: SupabaseClient, limit = 6) {
+  const { data, error } = await sb.from("course_details").select("*").gt("resource_count", 0)
+    .order("download_count", { ascending: false }).order("resource_count", { ascending: false }).order("code").limit(limit);
+  if (error) throw new Error(error.message);
+  return (data ?? []) as Course[];
+}
+
+export async function getFilterOptionsWith(sb: SupabaseClient) {
   const [years, semesters, departments] = await Promise.all([
-    supabase.from("academic_years").select("*").order("sort_order").order("label"),
-    supabase.from("semesters").select("*").order("sort_order").order("name"),
-    supabase.from("departments").select("id, name").order("name"),
+    sb.from("academic_years").select("*").order("sort_order").order("label"),
+    sb.from("semesters").select("*").order("sort_order").order("name"),
+    sb.from("departments").select("id, name").order("name"),
   ]);
   const semesterNames = Array.from(new Set(((semesters.data ?? []) as Semester[]).map((s) => s.name)));
   return {
@@ -116,10 +126,10 @@ export async function getFilterOptions() {
   };
 }
 
-export async function getPopularCourses(limit = 6) {
-  const { data, error } = await createClient()
-    .from("course_details").select("*").gt("resource_count", 0)
-    .order("resource_count", { ascending: false }).order("code").limit(limit);
-  if (error) throw new Error(error.message);
-  return (data ?? []) as Course[];
-}
+/* --------------------- always-fresh versions (admin area: reads the signed-in session) --------------------- */
+export const searchResources = async (p: ResourceSearch, featuredOnly = false) => searchResourcesWith(await createClient(), p, featuredOnly);
+export const getRecentResources = async (limit = 6) => getRecentResourcesWith(await createClient(), limit);
+export const getFeaturedResources = async (limit = 6) => getFeaturedResourcesWith(await createClient(), limit);
+export const getMostDownloaded = async (limit = 6) => getMostDownloadedWith(await createClient(), limit);
+export const getResource = async (id: string) => getResourceWith(await createClient(), id);
+export const getDepartments = async (limit?: number) => getDepartmentsWith(await createClient(), limit);

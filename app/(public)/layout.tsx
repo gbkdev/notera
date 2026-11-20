@@ -1,5 +1,6 @@
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { LiveRefresh } from "@/components/live-refresh";
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -8,6 +9,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
         Skip to content
       </a>
       <SiteHeader />
+      <LiveRefresh tables={["resources", "departments", "courses"]} minGap={5000} />
       <main id="main" className="mx-auto max-w-6xl px-4 sm:px-6">{children}</main>
       <SiteFooter />
     </>

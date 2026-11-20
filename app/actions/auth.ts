@@ -10,7 +10,7 @@ export async function signInAdmin(values: z.infer<typeof loginSchema>): Promise<
   const parsed = loginSchema.safeParse(values);
   if (!parsed.success) return { ok: false, error: "Enter your email and password." };
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data, error } = await supabase.auth.signInWithPassword(parsed.data);
   if (error || !data.user) return { ok: false, error: "Email or password is incorrect." };
 
@@ -24,5 +24,5 @@ export async function signInAdmin(values: z.infer<typeof loginSchema>): Promise<
 }
 
 export async function signOutAdmin() {
-  await createClient().auth.signOut();
+  await (await createClient()).auth.signOut();
 }
